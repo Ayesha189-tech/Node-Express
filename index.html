@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>To-Do App</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h2>📝 My To-Do List</h2>
+
+  <input type="text" id="taskInput" placeholder="Enter task name" />
+  <button onclick="addTask()">Add Task</button>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    // Load tasks on page load
+    window.onload = getTasks;
+
+    function getTasks() {
+      axios.get('/tasks')
+        .then(res => {
+          const list = document.getElementById('taskList');
+          list.innerHTML = '';
+          res.data.forEach(task => {
+            list.innerHTML += `<li>
+              ${task.taskName} 
+              <button onclick="deleteTask(${task.id})">Delete</button>
+            </li>`;
+          });
+        });
+    }
+
+    function addTask() {
+      const taskName = document.getElementById('taskInput').value;
+      axios.post('/addTask', { taskName })
+        .then(() => {
+          document.getElementById('taskInput').value = '';
+          getTasks(); // refresh task list
+        });
+    }
+
+    function deleteTask(id) {
+      axios.delete(`/task/${id}`)
+        .then(() => {
+          getTasks(); // refresh task list
+        });
+    }
+  </script>
+</body>
+</html>
